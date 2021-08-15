@@ -1,0 +1,53 @@
+@import "./breakpoints.scss";
+
+$grid-columns: 12;
+
+.d-grid {
+    display: grid;
+    grid-template-columns: repeat( $grid-columns, 1fr );
+
+
+    @mixin columns ($breakpoint: none ) {
+        $name: "";
+
+        @if $breakpoint != none {
+            $name: "-#{$breakpoint}";
+
+        }
+
+        @include maybe-onbreakpoint( $breakpoint ) {
+            & > .col#{$name}-auto {
+                grid-column: auto;
+            }
+            @for $i from 1 through $grid-columns {
+                & > .col#{$name}-#{$i}{
+                    grid-column: span $i;
+                }
+            }
+        }
+    }
+    // fix undersize
+    [class*=col-] {
+        grid-column: span $grid-columns;
+    }
+
+    @include columns(none);
+    @each $breakpoint-name, $value in $breakpoints {
+        @include columns($breakpoint-name);
+    }
+
+    &.justify-start      { justify-items: start   ; }
+    &.justify-end        { justify-items: end     ; }
+    &.justify-center     { justify-items: center       ; }
+    &.justify-around     { justify-items: space-around ; }
+    &.justify-between    { justify-items: space-between; }
+    &.justify-evenly     { justify-items: space-evenly ; }
+    
+    &.align-start        { align-items: start   ; }
+    &.align-end          { align-items: end     ; }
+    &.align-center       { align-items: center       ; }
+    &.align-around       { align-items: space-around ; }
+    &.align-between      { align-items: space-between; }
+    &.align-evenly       { align-items: space-evenly ; }
+
+}

@@ -1,0 +1,33 @@
+@import "../../../../style/colors/colors.scss";
+:host {
+    & > *:first-child {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top:0;
+        bottom: 0;
+    }
+}
+
+
+.spinner {
+    $border: 1rem;
+    $size: calc(256px - #{(2 * $border)});
+    width: $size;
+    height: $size;
+    box-sizing: border-box;
+    border-radius: 100%;
+    border: $border solid get-color('light',200); 
+    
+    border-bottom: $border solid get-color('primary');
+    border-top: $border solid get-color('accent') ;
+    animation: infinite ease-in-out 1.2s rotate;
+    @keyframes rotate {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+}

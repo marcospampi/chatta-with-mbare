@@ -1,0 +1,11 @@
+@import "../colors/colors.scss";
+img.img-selectable {
+    border-radius: $border-radius;
+    cursor: pointer;
+    &:hover {
+        box-shadow: 0 0 0 3px get-color("accent");
+    }
+    &.active {
+        box-shadow: 0 0 0 3px get-color("primary");
+    }
+}

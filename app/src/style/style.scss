@@ -1,0 +1,9 @@
+@import "./layout/index.scss";
+@import "./colors/colors.scss";
+@import "./components/components.scss";
+@import "./material-fix/index.scss";
+body {
+    font-family: 'Cantarell', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+}

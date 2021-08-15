@@ -1,0 +1,23 @@
+@import "../colors/colors.scss";
+@import "../layout/breakpoints.scss";
+.mat-dialog-container {
+    padding: 0 !important;
+    border-radius: $border-radius !important;
+    background-color: inherit;
+
+    @include between-breakpoints('xs', 'sm') {
+        width: 100vw !important;
+        height: 100vh !important;
+        border-radius: unset !important;
+        & > * > * {
+            height: 100%;
+        }
+    }
+}
+.cdk-overlay-pane {
+    @include between-breakpoints('xs', 'sm') {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: unset !important;
+    }
+}

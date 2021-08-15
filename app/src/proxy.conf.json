@@ -1,0 +1,14 @@
+{
+    "/api": {
+        "target": "http://localhost:8080/api",
+        "secure": false,
+        "ws": true,
+        "pathRewrite": {"^/api" : ""}
+    },
+    "/resources": {
+        "target": "http://localhost:8080/resources",
+        "secure": false,
+        "ws": false,
+        "pathRewrite": {"^/resources" : ""}
+    }
+}

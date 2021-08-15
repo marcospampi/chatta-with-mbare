@@ -1,0 +1,40 @@
+$breakpoints: (
+  xs: 0,
+  sm: 576px,// 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
+@function get-breakpoint($name) {
+    @return map-get($breakpoints, $name);
+}
+:root {
+    @each $name, $value in $breakpoints {
+        --constant-breakpoint-#{$name}: #{$value};
+    }
+}
+
+@mixin on-breakpoint($name) {
+    $breakpoint: map-get($breakpoints, $name);
+    @media all and ( min-width: $breakpoint ) {
+        @content;
+    }
+}
+
+@mixin between-breakpoints($lower, $higher) {
+    $lower-size: map-get($breakpoints, $lower);
+    $higher-size: map-get($breakpoints, $higher);
+    @media all and ( min-width: $lower-size ) and ( max-width: $higher-size) {
+        @content;
+    }
+}
+@mixin maybe-onbreakpoint($breakpoint: none ) {
+    @if $breakpoint != none {
+        @include on-breakpoint( $breakpoint ) { @content; }
+    }
+    @else {
+        @content;
+    }
+}

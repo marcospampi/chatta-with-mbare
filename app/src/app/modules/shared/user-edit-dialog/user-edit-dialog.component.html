@@ -1,0 +1,27 @@
+<div class="bg-{{(theme$|async)}}">
+    <div class="navbar auto-h d-flex justify-between align-center gap-1 pad-1">
+        <button class="btn btn-error" [disabled]="self.disableClose" (click)="self.close(undefined)">Close</button>
+        <span>Welcome!</span>
+        <button [disabled]="form.invalid" class="btn btn-accent" (click)="onSubmit($event)">Confirm</button>
+    </div>
+    <form class="content d-grid gap-2 pad-2" [formGroup]="form">
+        <span class="col-12"> Let's get started: choose an user name and a picture!</span>
+       <div class="col-12 d-flex column gap-1">
+           <input formControlName="username" type="text" id="username" class="input" placeholder="Username...">
+       </div>
+       <div class="col-12 d-grid justify-center gap-1 bg-content round-corners pad-1">
+            <img 
+            class="col-4 col-lg-3 img-selectable"
+            style="width:96px; height: 96px;" 
+ 
+            *ngFor="let name of (pictures$|async)"
+            [class.active]="form.controls.pictureName.value == name"
+
+            (click)="form.controls.pictureName.setValue(name); form.controls.pictureName.markAsDirty()"
+            src="/resources/pictures/{{name}}" alt=""
+            >
+            <div class="flex-fill-fix"></div>
+       </div>
+    </form>
+</div>
+

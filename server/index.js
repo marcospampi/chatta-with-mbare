@@ -1,0 +1,1 @@
+require("./dist/main").main( process.argv, process.env )

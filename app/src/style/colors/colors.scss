@@ -1,0 +1,110 @@
+@use "sass:color";
+@import "./adwaita/palette.scss";
+
+$border-radius: .50rem;
+
+@mixin bg-light {
+    background-color: get-color("light",900);
+    color: get-color("light",100);
+}
+
+
+@mixin bg-dark {
+    background-color: get-color("light",100);
+    color: get-color("light",800);
+}
+
+@mixin theme-trasparency($property, $value: 0.1 ) {
+    .bg-light & {
+        #{$property}: rgba(get-color("light",000), $value);
+    }
+    .bg-dark & {
+        #{$property}: rgba(get-color("light",900), $value);
+    }
+}
+
+@mixin border-theme {
+    .bg-light & {
+        border-color: get-color("light",700);
+    }
+    .bg-dark & {
+        border-color: get-color("light",300);
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    html, body { @include bg-light; }
+}
+@media (prefers-color-scheme: dark) {
+    html, body { @include bg-dark; }
+}
+
+.bg-light { 
+    transition: background 150ms ;
+    @include bg-light;
+    .bg-content {
+        background-color: rgba(#000000, $alpha: .1);
+    }
+}
+.bg-dark {
+    transition: background 150ms ;
+
+    @include bg-dark;
+    .bg-content {
+        background-color: rgba(#FFFFFF, $alpha: .2);
+    }
+}
+
+@mixin dark-mode {
+    .bg-dark & {
+        @content;
+    }
+}
+@mixin light-mode {
+    .bg-light & {
+        @content;
+    }
+}
+
+@each $name, $color in $color-palette {
+    @each $tone, $value in $color {
+        // foreground color
+        .fg-#{$name}-#{$tone} {
+            color: $value !important;
+        }
+        // border color
+        .bc-#{$name}-#{$tone} {
+            border-color: $value !important;
+        }
+        // background color
+        .bg-#{$name}-#{$tone} {
+            background-color: $value !important;
+            $blackness: color.blackness($value);
+            //@debug "#{$name} #{$tone} #{$blackness}";
+            @if $blackness <= 30% {
+                color: get-color("light",100) !important;
+            }
+            @else {
+                color: get-color("light",800) !important;
+            }
+        }
+        // outline color
+        .oc-#{$name}-#{$tone} {
+            background-color: $value !important;
+        }
+    }
+    @if $name != "light"{
+        .bg-#{$name} {
+            @extend .bg-#{$name}-300;
+        }
+        .fg-#{$name} {
+            @extend .fg-#{$name}-300;
+        }
+        .bc-#{$name} {
+            @extend .bc-#{$name}-300;
+        }
+        .oc-#{$name} {
+            @extend .oc-#{$name}-300;
+        }
+    }
+}

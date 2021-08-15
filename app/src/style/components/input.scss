@@ -1,0 +1,32 @@
+@use "sass:color";
+@use "sass:math";
+
+@import "../colors/colors.scss";
+input.input[type=text] {
+    display: inline-block;
+    border: none;
+    line-height: 220%;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0 .50rem;
+    border-radius: 4px; 
+    outline: none; // chrome di poop
+    //@include theme-trasparency(background-color,0.2);
+    @include dark-mode {
+        color: get-color("light",900);
+        background-color: get-color("light",200);
+    }
+    @include light-mode {
+        color: get-color("light",100);
+        background-color: rgba(#000, $alpha: .1);
+
+    }
+    &.ng-invalid.ng-touched {
+        box-shadow: 0 0 0 2px get-color("error");
+    }
+    &:focus, &:active{
+        box-shadow: 0 0 0 2px get-color("primary");
+    }
+ 
+
+}

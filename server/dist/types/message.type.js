@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MESSAGE_TYPE = void 0;
+var MESSAGE_TYPE;
+(function (MESSAGE_TYPE) {
+    MESSAGE_TYPE["TEXT"] = "MESSAGE_TYPE_TEXT";
+    MESSAGE_TYPE["CALL"] = "MESSAGE_TYPE_CALL";
+    MESSAGE_TYPE["LOST_CALL"] = "MESSAGE_TYPE_LOST_CALL";
+    MESSAGE_TYPE["ATTACHMENT"] = "MESSAGE_TYPE_ATTACHMENT";
+    MESSAGE_TYPE["CAPYBARA"] = "MESSAGE_TYPE_CAPYBARA";
+})(MESSAGE_TYPE = exports.MESSAGE_TYPE || (exports.MESSAGE_TYPE = {}));
