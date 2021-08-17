@@ -5,3 +5,5 @@ export type User = {
     isBusy?: boolean;
     isOnline?: boolean;
 }
+
+export type UserDatabaseEntity = User & { blocked: boolean };

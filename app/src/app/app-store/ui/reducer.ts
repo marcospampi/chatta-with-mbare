@@ -14,7 +14,7 @@ export const defaultTheme = ( ) => {
 export const reducer = createReducer<UIState>(
     {
         responsiveness: 'xs',
-        sidebar: false,
+        sidebar: true,
         theme: defaultTheme(),
         collapsedMenu: true
     },

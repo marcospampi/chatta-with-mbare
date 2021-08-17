@@ -6,14 +6,14 @@ const routes: Routes = [
   { path: '', 
     canActivate: [PublicGuardService], 
     pathMatch: 'full', 
-    loadChildren: () => import("@modules/startup/startup.module").then( m => m.StartupModule )
+    loadChildren: () => import("@modules/views/startup/startup.module").then( m => m.StartupModule )
   },
   { 
     path: 'app', 
     canActivate: [PrivateGuardService], 
-    loadChildren: () => import("@modules/root/root.module").then( m => m.RootModule )
+    loadChildren: () => import("@modules/views/root/root.module").then( m => m.RootModule )
   },
-  { path: 'component-test', loadChildren: () => import('@modules/component-test/component-test.module').then( m => m.ComponentTestModule)},
+  { path: 'component-test', loadChildren: () => import('@modules/views/component-test/component-test.module').then( m => m.ComponentTestModule)},
 ];
 
 @NgModule({

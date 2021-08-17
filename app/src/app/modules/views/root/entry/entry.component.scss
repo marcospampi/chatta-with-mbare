@@ -1,0 +1,32 @@
+@import "../../../../../style/layout/breakpoints.scss";
+::ng-deep {
+    body { overflow: hidden;}
+}
+.theme {
+    position: absolute;
+    top:0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 200vw;
+    overflow-x: hidden;
+    &.show {
+        left: 0;
+    }
+    &:not(.show) {
+        left:-100%;
+    }
+    @include on-breakpoint('md') {
+        width: 100vw;
+        left: 0 !important;
+    }
+    transition: left 150ms, background 150ms;
+    
+}
+
+.user-image {
+    $size: 2.5rem;
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 100%;
+}

@@ -1,12 +1,10 @@
 import { filter, fromEvent, map, Observable, share, Subscription } from "rxjs";
 import { Socket } from "socket.io";
-import { actions } from ".";
 import { Action, createAction, ofType } from "../actions";
 import { dispatcher } from "../dispatcher";
 import { User } from "../types";
-import { requestUserPatchResponse, userPatched } from "./actions";
-import { SessionManager } from "./session-manager";
-export * as actions from "./actions";
+import * as sessionActions from "./actions";
+import * as messageActions from "../messages"
 export class Session {
     get uuid(): string {
         return this.user.uuid;
@@ -24,11 +22,13 @@ export class Session {
         this.user = {
             uuid: user.uuid,
             username: user.username ?? 'New user',
-            pictureName: undefined
+            pictureName: user.pictureName
         };
+
+        console.log(user);
         this.requests$ = (fromEvent(socket,'message') as Observable<Action> ).pipe(share());
         this.send = ( action: Action ) => socket.send( action );
-        dispatcher.dispatch(actions.userLogged( this.user ));
+        dispatcher.dispatch(sessionActions.userLogged( this.user ));
 
 
         this.setupPublicEvents();
@@ -37,7 +37,7 @@ export class Session {
 
     public dispose( ) {
 
-        dispatcher.dispatch(actions.userLogout( this.user ));
+        dispatcher.dispatch(sessionActions.userLogout( this.user ));
         this.subscriptions.unsubscribe( );
 
     }
@@ -45,7 +45,7 @@ export class Session {
     public setupPublicEvents() {
         this.subscriptions.add(
             this.messages$.pipe(
-                ofType(actions.userLogged, actions.userLogout, actions.userPatched ),
+                ofType(sessionActions.userLogged, sessionActions.userLogout, sessionActions.userPatched ),
             ).subscribe({
                 next: this.send
             })
@@ -56,15 +56,15 @@ export class Session {
         // listen and dispatch a user list request to session manager
         this.subscriptions.add(
             this.requests$.pipe(
-                ofType(actions.requestUsersList),
-                map( action => actions.requestUsersList({requestedBy: this.uuid })),
+                ofType(sessionActions.requestUsersList),
+                map( action => sessionActions.requestUsersList({requestedBy: this.uuid })),
             ).subscribe({ next: action => dispatcher.dispatch( action )})
         );
 
         // listen and dispatch a user list request response to client
         this.subscriptions.add(
             this.messages$.pipe(
-                ofType(actions.requestUserListResponse ),
+                ofType(sessionActions.requestUserListResponse ),
                 filter( action => action.payload.requestedBy == this.uuid )
             ).subscribe( {next: this.send} )
         );
@@ -72,17 +72,57 @@ export class Session {
         // listen, execute and dispatch user patch requests, send response and dispatch feed
         this.subscriptions.add(
             this.requests$.pipe(
-                ofType( actions.requestUserPatch )
+                ofType( sessionActions.requestUserPatch )
             ).subscribe({
                 next: ( request ) => {
                     this.user.username = request.payload.patch.username ?? this.user.username;
                     this.user.pictureName = request.payload.patch.pictureName ?? this.user.pictureName;
                     this.user.isBusy = request.payload.patch.isBusy ?? this.user.isBusy;
 
-                    this.send( requestUserPatchResponse({ requestedBy: this.uuid, patched: this.user }) );
-                    dispatcher.dispatch( userPatched(this.user) );
+                    this.send( sessionActions.requestUserPatchResponse({ requestedBy: this.uuid, patched: this.user }) );
+                    dispatcher.dispatch( sessionActions.userPatched(this.user) );
                 }
             })
+        );
+
+        // listen and dispatch a message from this user
+        this.subscriptions.add(
+            this.requests$.pipe(
+                ofType( messageActions.sendMessage )
+            ).subscribe(
+                message => {
+                    message.payload.from = this.uuid;
+                    dispatcher.dispatch( message );
+                }
+            )
+        );
+
+        // listen and dispatch received messages to this user
+        this.subscriptions.add(
+            this.messages$.pipe(
+                ofType( messageActions.sendMessage ),
+                filter( message => message.payload.to === this.uuid ),
+            ).subscribe( this.send )
+        );
+        
+        // listen and dispatch message acknowledge from this user
+        this.subscriptions.add(
+            this.requests$.pipe(
+                ofType( messageActions.sendMessageAck ),
+            ).subscribe(
+                message => {
+                    message.payload.to = this.uuid;
+                    dispatcher.dispatch( message );
+                }
+            )
+        );
+        
+        // listen and dispatch message acknowledge to this user
+        this.subscriptions.add(
+            this.requests$.pipe(
+                ofType( messageActions.sendMessageAck ),
+                filter( message => message.payload.from === this.uuid)
+            ).subscribe( this.send )
         );
     }
 

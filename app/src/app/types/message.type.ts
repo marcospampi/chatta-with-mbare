@@ -3,7 +3,7 @@ export type Message = {
     from: string;
     to: string;
     text: string;
-    localDate: Date;
-    remoteDate?: Date;
+    localDate: number;
+    remoteDate?: number;
     seenOrSent: boolean;
 }

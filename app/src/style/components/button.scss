@@ -5,13 +5,22 @@
 
 .btn {
     outline: none;
+    line-height: 0;
+    font-family: inherit;
+    font-size: medium;
+    padding: .075rem .75rem;
+    border: none;
+    border-radius: $border-radius;  
     &:not(.icon){
         line-height: 200%;
-        font-family: inherit;
-        font-size: medium;
-        padding: .075rem .75rem;
-        border: none;
-        border-radius: $border-radius;      
+    
+    }
+    &.icon {
+        height: 2.75rem;
+        width: 2.75rem;
+        & > svg {
+            transform: scale(1.25);
+        }
     }
     @include theme-trasparency(background-color,0);
     @include theme-trasparency(color,1);
@@ -38,7 +47,6 @@
             &.btn-#{$color-name}:not(:disabled) {
                 $blackness: color.blackness(get-color($color-name));
                 $greeness: math.div(color.green(get-color($color-name)),255) * 100 ;
-                @debug $greeness;
                 @if $blackness <= 9% or $greeness > 80% {
                     color: get-color("light",100) !important;
                 }
@@ -65,4 +73,10 @@
         @include theme-trasparency(color,.5);
         
     }
+
+}
+
+.bg-dark .invert-on-dark {
+    filter: invert(1);
+
 }

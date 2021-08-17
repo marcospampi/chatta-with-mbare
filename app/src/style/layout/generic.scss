@@ -40,3 +40,7 @@ $border-size: 1px;
 .round-corners {
     border-radius: $border-radius;
 }
+
+.box-content {
+    box-sizing: content-box;
+}

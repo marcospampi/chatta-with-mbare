@@ -3,11 +3,13 @@ import { Server, Socket } from "socket.io"
 import { Action, ofType } from "../actions";
 import { dispatcher } from "../dispatcher";
 import { User } from "../types";
-import { actions, Session } from "./session"
+import { Session } from "./session"
+import * as actions from "./actions";
 export class SessionManager {
     public messages$: Observable<Action> = dispatcher.$;
     
     public sessions: Set<Session> = new Set;
+    public activeUsers: Set<string> = new Set;
     constructor( private server: Server ) {
         server.on( 'connect' , this.createSession.bind( this ) );
 
@@ -15,12 +17,19 @@ export class SessionManager {
     }
 
     private createSession( socket: Socket ) {
+        const uuid = socket.handshake.auth.uuid;
+        if ( this.activeUsers.has( uuid )) {
+            socket.disconnect( true );
+            return;
+        }
         const session = new Session( socket, socket.handshake.auth as any );
         this.sessions.add( session );
+        this.activeUsers.add( session.uuid );
         socket.once( 'disconnect', event => this.removeSession( session ));
     }
     private removeSession( session: Session ) {
         this.sessions.delete( session );
+        this.activeUsers.delete( session.uuid );
         session.dispose();
     }
 

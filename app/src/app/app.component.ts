@@ -16,7 +16,7 @@ export class AppComponent {
   ) {
     store.select( state => state).subscribe( console.log );
     
-    setTimeout( () => store.dispatch( user.prepare() ) , 1500 )
+    setTimeout( () => store.dispatch( user.prepare() ) , 0 )
     
   }
 

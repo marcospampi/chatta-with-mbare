@@ -2,19 +2,32 @@
 @use "sass:math";
 
 @import "../colors/colors.scss";
+textarea.input {
+    padding: .25rem .50rem;
+    line-height: 100%;
+}
 input.input[type=text] {
+    padding: 0rem .50rem;
+    line-height: 220%;
+
+}
+input.input[type=text], textarea.input {
+    user-select: unset;
     display: inline-block;
     border: none;
-    line-height: 220%;
     font-family: inherit;
     font-size: inherit;
-    padding: 0 .50rem;
+    
     border-radius: 4px; 
     outline: none; // chrome di poop
     //@include theme-trasparency(background-color,0.2);
     @include dark-mode {
         color: get-color("light",900);
         background-color: get-color("light",200);
+
+        &.dark-contrast-fix {
+            background-color: rgba(get-color("light",100), 0.50 );
+        }
     }
     @include light-mode {
         color: get-color("light",100);

@@ -18,8 +18,8 @@
         height: auto;
     }
     @include theme-trasparency(border-color,.2);
-    &, * {
-        line-height: 200%;
+    & , * {
+        //line-height: 200%;
     }
     & > .brand {
         font-size: x-large;

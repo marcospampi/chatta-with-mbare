@@ -10,6 +10,8 @@ import { AppStoreModule } from './app-store';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SharedModule } from '@modules/shared/shared.module';
 import { Pictures, PicturesService } from './services/pictures.service';
+import { SessionManagerModule } from '@modules/session-manager';
+import { DatabaseModule } from '@modules/database/database.module';
 
 @NgModule({
   declarations: [
@@ -27,7 +29,10 @@ import { Pictures, PicturesService } from './services/pictures.service';
     AppStoreModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    SharedModule
+    SessionManagerModule,
+    SharedModule,
+    DatabaseModule
+    
   ],
   providers: [
     {

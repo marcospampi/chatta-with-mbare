@@ -11,13 +11,18 @@ export const reducer = createReducer<User>(
        isBusy: false,
        isOnline: false 
     },
-    on( actions.setUser, ( state, props ) => props.user ),
-    on( actions.patchUserPatched, ( state, props ) => {
+    on( actions.setUser, ( state, props ) => {
+        localStorage['user'] = JSON.stringify(props.user);
+        return props.user
+    } ),
+    on( actions.patchUser, ( state, props ) => {
         const nextValue: User = {
             ...state,
-            ...props,
+            ...props.user,
             uuid: state.uuid
-        }
+        };
+        localStorage['user'] = JSON.stringify(nextValue);
+
         return nextValue;
     })
 )
