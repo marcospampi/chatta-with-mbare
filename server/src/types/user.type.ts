@@ -3,4 +3,5 @@ export type User = {
     username: string;
     pictureName?: string;
     isBusy?: boolean;
+    isOnline?: boolean;
 }

@@ -5,7 +5,31 @@
 }
 .messages { 
     flex-grow: 1;
+
+    position: relative;
+    & > .container {
+
+        position: absolute;
+        top:0;
+        bottom: 0;
+        left:0;
+        right: 0;
+    }   
+}
+
+.message {
     display: flex;
-    flex-flow: column;
-    overflow-y: scroll;
+    align-items: flex-start;
+
+
+    gap: 1rem;
+    &:not(.pal) {
+        justify-content: right;
+        flex-flow: row-reverse;
+    }
+    &.pal {
+        justify-content: left;
+    }
+
+
 }

@@ -22,7 +22,10 @@ export class Session {
         this.user = {
             uuid: user.uuid,
             username: user.username ?? 'New user',
-            pictureName: user.pictureName
+            pictureName: user.pictureName,
+            isOnline: true,
+            isBusy: false
+
         };
 
         console.log(user);
@@ -77,6 +80,7 @@ export class Session {
                 next: ( request ) => {
                     this.user.username = request.payload.patch.username ?? this.user.username;
                     this.user.pictureName = request.payload.patch.pictureName ?? this.user.pictureName;
+                    this.user.isOnline = true;
                     this.user.isBusy = request.payload.patch.isBusy ?? this.user.isBusy;
 
                     this.send( sessionActions.requestUserPatchResponse({ requestedBy: this.uuid, patched: this.user }) );
@@ -119,7 +123,7 @@ export class Session {
         
         // listen and dispatch message acknowledge to this user
         this.subscriptions.add(
-            this.requests$.pipe(
+            this.messages$.pipe(
                 ofType( messageActions.sendMessageAck ),
                 filter( message => message.payload.from === this.uuid)
             ).subscribe( this.send )

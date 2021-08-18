@@ -39,7 +39,7 @@ export class UserEffects {
                 )
         ),
         switchMap( user => concat([
-            actions.setUser({user}), 
+            actions.setUser({user:{...user, isBusy: false, isOnline: true}}), 
             actions.prepared() ]
         )),
         

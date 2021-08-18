@@ -26,6 +26,10 @@ $border-size: 1px;
 .text-unstyle { text-decoration: none ;}
 .text-underline { text-decoration: underline;}
 
+.text-break {
+    word-break: break-all;
+}
+
 [class*=border]{
     @include theme-trasparency(border-color,.2);
 }

@@ -20,7 +20,9 @@
     &.align-between      { align-items: space-between; }
     &.align-evenly       { align-items: space-evenly ; }
     
-
+    &.nowrap {
+        flex-wrap: nowrap;
+    }
 
     //&.row { flex-direction: row; };
     //&.row-reverse { flex-direction: row-reverse; };

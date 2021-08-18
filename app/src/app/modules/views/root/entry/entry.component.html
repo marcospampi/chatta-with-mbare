@@ -1,6 +1,6 @@
 <div *ngIf="(ui$|async) as ui" class="theme d-grid" [class.bg-dark]="ui.theme == 'dark'"
     [class.bg-light]="ui.theme == 'light'" [class.show]="ui.sidebar">
-    <div class="col-xs-6 col-md-5 col-lg-4 col-xl-3 col-xxl-2 border-right">
+    <div id="navbar" class="col-md-5 col-lg-4 col-xl-3 col-xxl-2 border-right">
 
         <div class="navbar d-flex top align-center">
             <div 
@@ -20,7 +20,7 @@
                         </g>
                     </svg>
                     <svg *ngSwitchDefault xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-                        <path d="M6.81 1.102A7 7 0 0 0 1 8a7 7 0 0 0 7 7 7 7 0 0 0 4.594-1.729A8.797 8.797 0 0 1 6 4.766a8.797 8.797 0 0 1 .81-3.664z" style="isolation:auto;mix-blend-mode:normal;marker:none" color="#000" overflow="visible" fill="#474747"/>
+                        <path d="M6.81 1.102A7 7 0 0 0 1 8a7 7 0 0 0 7 7 7 7 0 0 0 4.594-1.729A8.797 8.797 0 0 1 6 4.766a8.797 8.797 0 0 1 .81-3.664z" style="isolation:auto;mix-blend-mode:normal;marker:none" color="#000" overflow="visible" fill="fillColor"/>
                     </svg>
                 </ng-container>
 
@@ -53,8 +53,8 @@
 
         </div>
     </div>
-    <div class="col-xs-6 col-md-7 col-lg-8 col-xl-9 col-xxl-10 d-flex column">
-        <div class="navbar d-flex top align-center">
+    <div id="router" class="col-md-7 col-lg-8 col-xl-9 col-xxl-10 d-flex column">
+        <!--<div class="navbar d-flex top align-center">
             <button *ngIf="ui.collapsedMenu" class="btn icon invert-on-dark icon" (click)="toggleSidebar()">
                 <svg height="16px" viewBox="0 0 16 16" width="16px" xmlns="http://www.w3.org/2000/svg">
                     <g fill="fillColor">
@@ -65,7 +65,7 @@
                 </svg>
             </button>
             <span class="brand flex-grow">Navbar</span>
-        </div>
+        </div>-->
         <div class="flex-grow d-flex column">
             <router-outlet></router-outlet>
 

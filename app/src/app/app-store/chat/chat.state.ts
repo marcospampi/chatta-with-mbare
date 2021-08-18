@@ -13,13 +13,15 @@ export interface ChatState extends EntityState<Message> {
     size: number;
     offset: number;
     end: boolean;
+    fromTime: number;
 }
 
 export const initialState = entityAdapter.getInitialState({
     chat: [ undefined, undefined ],
     size: undefined,
     offset: undefined,
-    end: false
+    end: false,
+    fromTime: null
 });
 
 const featureSelector = createFeatureSelector<ChatState>('chat');
@@ -29,5 +31,5 @@ const _selectors = entityAdapter.getSelectors();
 export const selectors = {
     selectAll: createSelector( featureSelector, _selectors.selectAll ),
     selectCount: createSelector( featureSelector, _selectors.selectTotal ),
-    selectState: createSelector( featureSelector, ({chat, size, offset, end}) => ({chat, size, offset, end}))
+    selectState: createSelector( featureSelector, ({chat, size, offset, end, fromTime}) => ({chat, size, offset, end, fromTime}))
 }

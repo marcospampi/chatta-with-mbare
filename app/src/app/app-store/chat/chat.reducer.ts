@@ -12,7 +12,8 @@ export const reducer = createReducer(
             chat: p.chat,
             offset: p.offset,
             size: p.size,
-            end: p.end
+            end: p.end,
+            fromTime: p.fromTime
         };
         return state;
     })
