@@ -20,16 +20,32 @@
 .message {
     display: flex;
     align-items: flex-start;
-
-
     gap: 1rem;
+    &  .time {
+        font-size: 10px;
+    }
     &:not(.pal) {
+        .bg-content {
+            display: flex;
+            flex-flow: column;
+            align-items: flex-end;
+        }
         justify-content: right;
         flex-flow: row-reverse;
+        & .time {
+            text-align: right;
+        }
     }
     &.pal {
+        .bg-content {
+            display: flex;
+            flex-flow: column;
+            align-items: flex-start;
+        }
         justify-content: left;
     }
+    &  .content {
 
+    }
 
 }

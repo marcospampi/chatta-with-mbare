@@ -14,7 +14,6 @@ export class AppComponent {
     private store: Store<AppState>,
     private pictures: PicturesService
   ) {
-    store.select( state => state).subscribe( console.log );
     
     setTimeout( () => store.dispatch( user.prepare() ) , 0 )
     

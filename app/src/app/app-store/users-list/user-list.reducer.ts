@@ -7,12 +7,12 @@ export const reducer = createReducer<UserListState>(
         ( state, props) => adapter.setAll( props.payload.users, state )
     ),
     on( sessionActions.userLogged,
-        ( state, props ) => adapter.addOne( props.payload, state )
+        ( state, props ) => adapter.setOne( props.payload, state )
     ),
     on( sessionActions.userPatched,
         ( state, props ) => adapter.updateOne( {id: props.payload.uuid, changes:props.payload} , state )    
     ),
     on( sessionActions.userLogout,
-        ( state, props ) => adapter.removeOne( props.payload.uuid, state )
+        ( state, props ) => adapter.updateOne( {id: props.payload.uuid, changes: { isBusy: false, isOnline: false } }, state )
     )
 )

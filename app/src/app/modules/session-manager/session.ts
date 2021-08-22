@@ -18,7 +18,7 @@ export class Session {
             );
         
         this.subscriptions.add( this.actions$.subscribe({
-            next: action => console.log(action),
+            /*next: action => console.log(action),*/
             complete: () => console.log({"socket-disconnected": this.socket})
         }));
         this.subscriptions.add( this.disconnect$.subscribe(

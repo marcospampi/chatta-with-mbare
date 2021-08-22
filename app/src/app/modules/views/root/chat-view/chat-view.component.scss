@@ -1,0 +1,8 @@
+:host {
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+    & > app-chat {
+        flex-grow: 1;
+    }
+}

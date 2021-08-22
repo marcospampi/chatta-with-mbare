@@ -15,7 +15,7 @@ import { DatabaseModule } from '@modules/database/database.module';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,

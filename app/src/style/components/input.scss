@@ -34,9 +34,16 @@ input.input[type=text], textarea.input {
         background-color: rgba(#000, $alpha: .1);
 
     }
-    &.ng-invalid.ng-touched {
+    &.error {
         box-shadow: 0 0 0 2px get-color("error");
     }
+    &.on-touched.ng-invalid.ng-touched {
+        @extend .error;
+    }
+    &.on-dirty.ng-invalid.ng-touched {
+        @extend .error;
+    }
+
     &:focus, &:active{
         box-shadow: 0 0 0 2px get-color("primary");
     }

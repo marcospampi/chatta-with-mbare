@@ -24,7 +24,8 @@
       "@store/*": ["app/app-store/*"],
       "@modules/*": ["app/modules/*"],
       "@decl/*": ["app/types/*"],
-      "@services/*": ["app/services/*"]
+      "@services/*": ["app/services/*"],
+      "@utils/*": [ "app/utils/*"]
     }
   },
   "angularCompilerOptions": {

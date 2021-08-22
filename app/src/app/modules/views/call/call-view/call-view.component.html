@@ -1,0 +1,81 @@
+<div class="bg-dark full-screen d-flex column">
+    <div class="content flex-grow">
+        <audio #audioOutput ></audio>
+        <video style="max-width: 320px; max-height: 240px; background-color: white;" #videoOutput ></video>
+        <video style="max-width: 320px; max-height: 240px; background-color: white;" #screenOutput></video>
+
+    </div>
+    <div class="navbar d-flex bottom align-center justify-center" >
+        <button class="btn icon invert-on-dark" (click)="localStream.toggleTrack('audio')" >
+
+            <ng-container [ngSwitch]="(active$|async).audio">
+                <svg *ngSwitchCase="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                    <g fill="fillColor">
+                        <path d="m 119,-19 v 3 h 2 v -3 z"
+                            style="line-height:normal;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000;text-transform:none;text-orientation:mixed;white-space:normal;shape-padding:0;isolation:auto;mix-blend-mode:normal;solid-color:#000;solid-opacity:1"
+                            color="#000" font-weight="400" font-family="sans-serif" overflow="visible"
+                            transform="translate(-112 32)" />
+                        <path
+                            d="m 119.9998,-32 c 1.662,0 3,1.338 3,3 v 5 c 0,1.662 -1.338,3 -3,3 -1.662,0 -3,-1.338 -3,-3 v -5 c 0,-1.662 1.338,-3 3,-3 z"
+                            transform="translate(-112 32)" />
+                        <path
+                            d="m 114,-26 v 2.009766 c 0,3.306582 2.68969,5.990234 6,5.990234 3.31031,0 6,-2.683652 6,-5.990234 V -26 h -1.5 v 2.009766 c 0,2.500097 -1.99331,4.490234 -4.5,4.490234 -2.50669,0 -4.5,-1.990137 -4.5,-4.490234 V -26 Z"
+                            style="line-height:normal;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000;text-transform:none;text-orientation:mixed;white-space:normal;shape-padding:0;isolation:auto;mix-blend-mode:normal;solid-color:#000;solid-opacity:1"
+                            color="#000" font-weight="400" font-family="sans-serif" overflow="visible"
+                            transform="translate(-112 32)" />
+                    </g>
+                </svg>
+                <svg *ngSwitchDefault xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                    <g fill="fillColor">
+                        <path d="m 213.531,228.469 -1.061,1.061 14,14 1.062,-1.062 z" transform="translate(-212 -228)" />
+                        <path
+                            d="m 220,228 c -1.662,0 -3,1.338 -3,3 v 1.64453 l 5.2832,5.2832 C 222.72383,237.4058 223,236.73965 223,236 v -5 c 0,-1.662 -1.338,-3 -3,-3 z m -6,6 v 2.00977 c 0,2.96574 2.16538,5.4238 5,5.90039 V 244 h 2 v -2.08984 c 0.64598,-0.10861 1.24984,-0.33194 1.80859,-0.62891 l -1.11132,-1.11133 C 221.17391,240.38 220.60353,240.5 220,240.5 c -2.50669,0 -4.5,-1.99014 -4.5,-4.49023 V 234 Z m 10.5,0 v 2.00977 c 0,1.15729 -0.44099,2.19439 -1.14844,2.98632 l 1.05274,1.05274 C 225.38802,238.9836 226,237.57264 226,236.00977 V 234 Z m -7.5,1.47266 V 236 c 0,1.662 1.338,3 3,3 0.16422,0 0.3216,-0.0237 0.47852,-0.0488 z"
+                            style="line-height:normal;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000;text-transform:none;text-orientation:mixed;white-space:normal;shape-padding:0;isolation:auto;mix-blend-mode:normal;solid-color:#000;solid-opacity:1"
+                            color="#000" font-weight="400" font-family="sans-serif" overflow="visible"
+                            transform="translate(-212 -228)" />
+                    </g>
+                </svg>
+            </ng-container>
+            
+
+        </button>
+         <button class="btn icon invert-on-dark" (click)="localStream.toggleTrack('video')">
+            <ng-container [ngSwitch]="(active$|async).video">
+                <svg *ngSwitchCase="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                    <path
+                    d="M6 4h8c.554 0 1 .446 1 1v7c0 .554-.446 1-1 1H6c-.554 0-1-.446-1-1V5c0-.554.446-1 1-1zM5 8.47L1.53 5H1v7h.5z"
+                    style="marker:none" overflow="visible" color="#bebebe" fill="fillColor" />
+                </svg>
+                <svg *ngSwitchDefault xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                    <path
+                    d="m1.5293 0.46875-1.0605 1.0625 14 14 1.0625-1.0625-1.4746-1.4746c0.52675-0.029902 0.94336-0.45965 0.94336-0.99414v-7c0-0.554-0.446-1-1-1h-8c-0.26143 0-0.49602 0.10251-0.67383 0.26562l-3.7969-3.7969zm-0.5293 4.5312v7h0.5l3.5-3.5293-3.4707-3.4707h-0.5293zm4 3.4707v3.5293c0 0.554 0.446 1 1 1h3.8984l-4.8984-4.8984v0.36914z" />
+                </svg>
+            </ng-container>
+            
+
+        </button>
+        <button class="btn icon" *ngIf="(active$|async) as state" [class]="{
+            'invert-on-dark': !state.screen,
+            'btn-accent': state.screen
+        }"
+        (click)="localStream.toggleTrack('screen')"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                <path
+                    d="M3 1C1.338 1 0 2.338 0 4v7c0 1.662 1.338 3 3 3h10c1.662 0 3-1.338 3-3V4c0-1.662-1.338-3-3-3zm0 2h10c.554 0 1 .446 1 1v7c0 .554-.446 1-1 1H3c-.554 0-1-.446-1-1V4c0-.554.446-1 1-1zm5 13c3 0 4-1 4-1H4s1 1 4 1z"
+                    fill="fillColor" /></svg>
+
+        </button>
+        <button class="btn icon btn-error">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16.006" height="16">
+                <path
+                    d="M14.242 11.715a.979.979 0 01-1.387 0l-1.04-1.04-1.041-1.04a.979.979 0 010-1.388l.493-.493a6.838 6.838 0 00-6.534 0l.493.493a.979.979 0 010 1.387l-1.04 1.04-1.04 1.04a.979.979 0 01-1.388 0l-1.04-1.04a2.452 2.452 0 010-3.467l.347-.347c3.818-3.818 10.052-3.818 13.87 0l.347.347c.957.958.957 2.51 0 3.468z"
+                    style="line-height:normal;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000;text-transform:none;text-orientation:mixed;shape-padding:0;isolation:auto;mix-blend-mode:normal;marker:none"
+                    color="#000" font-weight="400" font-family="sans-serif" overflow="visible" fill="fillColor" />
+            </svg>
+
+        </button>
+
+       
+    </div>
+</div>

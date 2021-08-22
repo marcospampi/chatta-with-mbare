@@ -2,6 +2,17 @@ import { createReducer, on } from "@ngrx/store";
 import { UIState } from ".";
 import { actions } from "./actions";
 
+export const themeColor = {
+    'dark': getComputedStyle(document.documentElement).getPropertyValue(`--theme-color-dark`),
+    'light': getComputedStyle(document.documentElement).getPropertyValue(`--theme-color-light`),
+    set theme( theme: string ) {
+        // @ts-ignore
+        document.querySelector("meta[name='theme-color']").content = this[theme];
+    }
+}
+
+
+
 export const defaultTheme = ( ) => {
     const whatShouldBe = matchMedia("(prefers-color-scheme: dark)").matches ? 'dark' : 'light';
     const butUserExpects = localStorage['theme'];
@@ -10,7 +21,7 @@ export const defaultTheme = ( ) => {
     else
         return whatShouldBe;
 };
-
+themeColor.theme = defaultTheme();
 export const reducer = createReducer<UIState>(
     {
         responsiveness: 'xs',
@@ -35,6 +46,7 @@ export const reducer = createReducer<UIState>(
                 : state.theme == 'dark' ? 'light' : 'dark'
         };
         localStorage['theme'] = newState.theme;
+        themeColor.theme = newState.theme;
         return newState;
     })
 );

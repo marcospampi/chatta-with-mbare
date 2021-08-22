@@ -29,7 +29,6 @@ export class UserEditDialogComponent implements OnInit, OnDestroy {
 
     this.subscriptions$.add(this.store.select('user').subscribe(
       user => {
-        console.log( user )
         this.form.patchValue({username: user.username, pictureName: user.pictureName })
       }
     ));

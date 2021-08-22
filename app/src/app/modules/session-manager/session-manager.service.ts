@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Store, Action } from '@ngrx/store';
 import io, { Socket } from "socket.io-client";
-import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
-import { mapTo, share, skip, switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, fromEvent, Observable, Subject, throwError } from 'rxjs';
+import { catchError, delay, mapTo, share, skip, switchMap, take } from 'rxjs/operators';
 
 import { AppState } from '@store/app-state';
 import { SessionManagerModule } from './session-manager.module';

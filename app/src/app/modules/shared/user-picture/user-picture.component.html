@@ -1,0 +1,9 @@
+<div class="container">
+    <img class="user-image" src="/resources/pictures/{{user.pictureName}}" alt="">
+    <div class="status-mark"
+        [class.bg-error]="user.isOnline && user.isBusy"
+        [class.bg-accent]="user.isOnline && !user.isBusy"
+    >
+
+    </div>
+</div>

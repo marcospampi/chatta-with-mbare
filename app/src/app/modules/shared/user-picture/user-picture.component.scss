@@ -1,0 +1,15 @@
+.container {
+    position: relative;
+    height: 2.5rem;
+    width: 2.5rem;
+    & > .status-mark {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background-color: gray;
+        width: 16px;
+        height: 16px;
+        border-radius: 100%;
+
+    }
+}

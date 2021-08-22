@@ -1,6 +1,12 @@
 @use "sass:color";
 @import "./adwaita/palette.scss";
 
+:root {
+    --theme-color-dark: #{get-color("light",200)};
+    --theme-color-light: #{get-color("light",800)};
+}
+ 
+
 $border-radius: .50rem;
 
 @mixin bg-light {

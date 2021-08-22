@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core';
 import { User, Message } from '@decl/index';
 import Dexie, { Collection, Database, DBCoreTable, IndexableTypeArrayReadonly, PromiseExtended, TableHooks, TableSchema, ThenShortcut, WhereClause } from "dexie"
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DatabaseService {
-  private db: Dexie;
+  public db: Dexie;
   public users: Dexie.Table<User,string>;
   public messages: Dexie.Table<Message,string>
   constructor() {
@@ -18,6 +20,11 @@ export class DatabaseService {
     this.messages = db.table('messages');
 
     Reflect.defineProperty( window, 'dexie', {value: db} );
+  }
+
+  async clear() {
+    await this.db.delete();
+    window.location.reload();  
   }
 }
 

@@ -13,7 +13,7 @@ export class PicturesService {
     this.$ = this.pictures$ = http.get<Array<string>>(`/api/pictures`).pipe(
       shareReplay(1)
     );
-    this.$.subscribe( pictures => console.log( {pictures} ) );
+    this.$.subscribe( );
   }
 }
 

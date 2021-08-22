@@ -14,13 +14,5 @@ export function ofType( ...types: any[] ) {
                 : 'type' in el && action.type == el.type
         )
     );
-    //for 
-    //console.log( type, 'type' in type, type?.type);
-    //if ( typeof(type) == 'string') {
-    //    return filter( (input: Action<any,any>) => input.type === type)
-    //}
-    //else if ( typeof(type) == 'function' && 'type' in type ) {
-    //    return filter( (input: Action<any,any>) => input.type === type.type )
-    //}
-    //return mapTo(EMPTY);
+
 }

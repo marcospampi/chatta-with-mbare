@@ -28,7 +28,6 @@ export class Session {
 
         };
 
-        console.log(user);
         this.requests$ = (fromEvent(socket,'message') as Observable<Action> ).pipe(share());
         this.send = ( action: Action ) => socket.send( action );
         dispatcher.dispatch(sessionActions.userLogged( this.user ));

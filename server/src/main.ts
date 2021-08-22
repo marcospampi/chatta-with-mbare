@@ -1,11 +1,15 @@
-import { Dictionary } from "./utils";
-import io from "socket.io";
 import http from "http";
+
+import io from "socket.io";
 import express from "express";
+import { ExpressPeerServer as peerServer } from "peer";
+
+import { Dictionary } from "./utils";
 import { SessionManager } from "./sessions";
 import { createAction, payload } from "./actions";
 
 import { api_route, resources_route } from "./routes"
+
 
 
 export function main ( args: string[], env: Dictionary<string> ): void {
@@ -15,8 +19,10 @@ export function main ( args: string[], env: Dictionary<string> ): void {
     const ioapp = new io.Server( server, { path: '/api/ws' });
 
     app.use('/api', api_route );
-    app.use( resources_route );
+    app.use('/api/peer', peerServer( server ))
 
+    app.use( resources_route );
+    
 
     const sessionManager = new SessionManager( ioapp );
 
