@@ -21,3 +21,10 @@
         max-width: unset !important;
     }
 }
+.mat-bottom-sheet-container {
+    @include between-breakpoints('xs', 'sm') {
+    position: absolute !important;
+    bottom: 0 !important;
+    }
+}
+

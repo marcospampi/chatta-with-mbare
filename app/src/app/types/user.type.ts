@@ -5,6 +5,7 @@ export type User = {
     isBusy?: boolean;
     isOnline?: boolean;
     isPal?: boolean;
+    isBlocked?: boolean;
 }
 
 export type UserDatabaseEntity = User & { blocked: boolean };

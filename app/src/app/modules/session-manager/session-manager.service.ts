@@ -31,7 +31,7 @@ export class SessionManager {
       take(1),
       switchMap(
         user => {
-          const socket = io({ path: '/api/ws', auth: user });
+          const socket = io({ path: '/api/ws', auth: user, transports: [ 'websocket'] });
           const s = this.session = new Session(socket);
           s.actions$.subscribe(action => this.actions$$.next(action));
           s.disconnect$.subscribe(this.ondisconnect.bind(this));

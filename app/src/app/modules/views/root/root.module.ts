@@ -14,12 +14,26 @@ const routes: Routes = [
       { path: 'readme', component: ReadmeViewComponent },
       { path: 'chat/:uuid', component: ChatViewComponent },
       {
-        path: 'call', loadChildren: ( ) => import("../call/call.module").then( m => m.CallModule )
+        path: 'avchat', loadChildren: ( ) => import("../call/call.module").then( m => m.CallModule )
       },
+      {
+        /**
+         * holyF_trick explaination:
+         * avchat is lazy loaded and angular is evil, once I navigate by router.navigate([...])
+         * to avchar/anwswer/:uuid it just do nothing, it doesn't even load the F bundle
+         * soso, I thought of this, it works, WHAT THE HOLY F
+         * PS. I didn't even know that we could redirect parameters like this.
+         * no more chat apps once this gets approved by Sensei. FFFFFFFFFFFFFFFFFFFFFFF
+         * PS nr2.: this may be related to the /app guard having fun times.
+         */
+        path: "holyF_trick/:uuid",
+        redirectTo: "avchat/answer/:uuid"
+      },
+      { path: '**', redirectTo: 'readme' }
+
     ]
   },
   
-  { path: '**', component: ReadmeViewComponent }
 
 ]
 

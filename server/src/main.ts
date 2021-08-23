@@ -17,9 +17,9 @@ export function main ( args: string[], env: Dictionary<string> ): void {
     const app = express();
     const server = http.createServer( app );
     const ioapp = new io.Server( server, { path: '/api/ws' });
-
+    const peer = peerServer( server, { path: '/api/peer'})
     app.use('/api', api_route );
-    app.use('/api/peer', peerServer( server ))
+    //app.use('/api/peer', )
 
     app.use( resources_route );
     

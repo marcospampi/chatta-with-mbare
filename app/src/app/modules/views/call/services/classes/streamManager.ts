@@ -1,12 +1,12 @@
 import { BehaviorSubject, combineLatest, fromEvent, Observable } from "rxjs";
 import { map, shareReplay } from "rxjs/operators";
 
-type StreamManagerObservableContent = {
+export type StreamManagerObservableContent = {
     video: MediaStream|null;
     audio: MediaStream|null;
     screen: MediaStream|null;
 }
-type StreamManagerTrackType = 'video'|'audio'|'screen';
+export type StreamManagerTrackType = 'video'|'audio'|'screen';
 export abstract class StreamManager {
     private video$$ = new BehaviorSubject<MediaStream|null>(null);
     private audio$$ = new BehaviorSubject<MediaStream|null>(null);
@@ -37,7 +37,6 @@ export abstract class StreamManager {
             this.detachSource( subject );
         }
         subject.next( source );
-
         fromEvent( source, 'ended', { once: true }).subscribe(
             event => this.detachSource( subject )
         );

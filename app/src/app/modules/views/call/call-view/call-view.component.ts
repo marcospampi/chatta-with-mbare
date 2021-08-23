@@ -10,9 +10,9 @@ import { LocalUserStreamManager } from '../services/classes/streamManager';
   styleUrls: ['./call-view.component.scss']
 })
 export class CallViewComponent implements OnInit, OnDestroy {
-  @ViewChild("audioOutput", { static: true }) audioOutput: ElementRef<HTMLAudioElement>;
-  @ViewChild("videoOutput", { static: true }) videoOutput: ElementRef<HTMLVideoElement>;
-  @ViewChild("screenOutput", { static: true }) screenOutput: ElementRef<HTMLVideoElement>;
+  //@ViewChild("audioOutput", { static: true }) audioOutput: ElementRef<HTMLAudioElement>;
+  //@ViewChild("videoOutput", { static: true }) videoOutput: ElementRef<HTMLVideoElement>;
+  //@ViewChild("screenOutput", { static: true }) screenOutput: ElementRef<HTMLVideoElement>;
 
   public localStream = new LocalUserStreamManager;
   public active$: Observable<any>;
@@ -29,22 +29,22 @@ export class CallViewComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions = new Subscription;
-    this.subscriptions.add(
-      this.localStream.$.pipe(
-        skip(1),
-        mergeMap( e => from(Object.entries(e).map(e => ({type: e[0], stream: e[1]})))),
-        groupBy( e => e.type ),
-        mergeMap( e => e.pipe( distinctUntilKeyChanged('stream')))
-      ).subscribe( this.handleVideoChanges.bind( this ) )
-    )
+    //this.subscriptions.add(
+    //  this.localStream.$.pipe(
+    //    skip(1),
+    //    mergeMap( e => from(Object.entries(e).map(e => ({type: e[0], stream: e[1]})))),
+    //    groupBy( e => e.type ),
+    //    mergeMap( e => e.pipe( distinctUntilKeyChanged('stream')))
+    //  ).subscribe( this.handleVideoChanges.bind( this ) )
+    //);
   }
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
 
   handleVideoChanges( input: {type: string, stream: MediaStream} ): void {
-    
-    switch( input.type ) {
+    return;
+    /*switch( input.type ) {
       case 'video': {
         this.videoOutput.nativeElement.srcObject = input.stream;
         if ( input.stream )
@@ -69,7 +69,7 @@ export class CallViewComponent implements OnInit, OnDestroy {
           this.screenOutput.nativeElement.pause();
         break;
       };
-    }
+    } */
   }
 
 }

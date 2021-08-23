@@ -7,6 +7,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { UserModule } from './user';
 import { UsersListModule } from './users-list';
 import { ChatFeatureModule } from './chat';
+import { CallFeatureModule } from './call';
 
 
 
@@ -23,7 +24,8 @@ import { ChatFeatureModule } from './chat';
     UiFeatureModule,
     UserModule,
     UsersListModule,
-    ChatFeatureModule
+    ChatFeatureModule,
+    CallFeatureModule
   ]
 })
 export class AppStoreModule { }

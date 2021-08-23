@@ -27,7 +27,7 @@ export class SessionManager {
         this.activeUsers.add( session.uuid );
         socket.once( 'disconnect', event => this.removeSession( session ));
     }
-    private removeSession( session: Session ) {
+    private removeSession( session: Session) {
         this.sessions.delete( session );
         this.activeUsers.delete( session.uuid );
         session.dispose();

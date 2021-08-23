@@ -1,9 +1,11 @@
 <div class="bg-dark full-screen d-flex column">
     <div class="content flex-grow">
-        <audio #audioOutput ></audio>
-        <video style="max-width: 320px; max-height: 240px; background-color: white;" #videoOutput ></video>
-        <video style="max-width: 320px; max-height: 240px; background-color: white;" #screenOutput></video>
-
+        <!--
+            <audio #audioOutput ></audio>
+            <video style="max-width: 320px; max-height: 240px; background-color: white;" #videoOutput ></video>
+            <video style="max-width: 320px; max-height: 240px; background-color: white;" #screenOutput></video>
+        -->
+        <call-present [streams]="localStream.$"></call-present>
     </div>
     <div class="navbar d-flex bottom align-center justify-center" >
         <button class="btn icon invert-on-dark" (click)="localStream.toggleTrack('audio')" >

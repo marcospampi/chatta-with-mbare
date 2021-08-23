@@ -35,12 +35,15 @@ export class Session {
 
         this.setupPublicEvents();
         this.setupPrivateEvents();
+        this.setupCallEvents();
     }
 
     public dispose( ) {
 
         dispatcher.dispatch(sessionActions.userLogout( this.user ));
         this.subscriptions.unsubscribe( );
+
+        this.socket.disconnect( true )
 
     }
 
@@ -129,6 +132,47 @@ export class Session {
         );
     }
 
+    public setupCallEvents() {
+
+        // dispatch actions such as a call request and an answer response, caller ready event and callClose
+        this.subscriptions.add(
+            this.requests$.pipe(
+                ofType( messageActions.callUser, messageActions.answerUser , messageActions.callerReady, messageActions.callClosed)
+            ).subscribe(
+                message => dispatcher.dispatch( message )
+            )
+        );
+
+        // subscribe and dispatch to client answers from callee, can have peer id if accepted
+        this.subscriptions.add(
+            this.messages$.pipe(
+                ofType( messageActions.answerUser ),
+                filter( e => e.payload.caller == this.uuid )
+            ).subscribe(
+                this.send
+            )
+        );
+        // subscribe and dispatch to client call request and ready answer from caller
+        this.subscriptions.add(
+            this.messages$.pipe(
+                ofType( messageActions.callerReady, messageActions.callUser ),
+                filter( e => e.payload.callee == this.uuid )
+            ).subscribe(
+                this.send
+            )
+        );
+
+        // subscribe to closed calls and that's all
+        this.subscriptions.add(
+            this.messages$.pipe(
+                ofType( messageActions.callClosed ),
+                filter( e => Object.values(e.payload).includes( this.uuid ) )
+            ).subscribe(
+                this.send
+            )
+        )
+
+    }
     
     
 }
