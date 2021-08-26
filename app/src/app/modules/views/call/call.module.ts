@@ -8,16 +8,24 @@ import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { CallGuardService } from './services/call-guard.service';
 import { AnswerGuardService } from './services/answer-guard.service';
 import { AnswerDialogComponent } from './components/answer-dialog/answer-dialog.component';
+import { CallService } from './services/call.service';
+import { ResolveCallManagerService } from './services/resolve-call-manager.service';
 
 const routes: Routes = [
   {
     path: 'call/:uuid',
     canActivate: [ CallGuardService ],
+    resolve: {
+      callManager: ResolveCallManagerService
+    },
     component: CallViewComponent
   },
   {
     path: 'answer/:uuid',
     canActivate: [ AnswerGuardService ],
+    resolve: {
+      callManager: ResolveCallManagerService
+    },
     component: CallViewComponent
   }
 ]
@@ -33,6 +41,12 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild( routes ),
     MatBottomSheetModule
+  ],
+  providers: [
+    CallService,
+    CallGuardService,
+    AnswerGuardService,
+    ResolveCallManagerService
   ],
   exports: [
     RouterModule

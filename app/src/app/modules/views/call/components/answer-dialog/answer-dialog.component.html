@@ -1,1 +1,13 @@
-<p>answer-dialog works!</p>
+<div class="bg-dark flex-center column gap-1">
+    <div class="spinner-container" style="transform: scale(.5);">
+        <div class="spinner" >
+
+        </div>
+    </div>
+
+    <h2 *ngIf="(caller$|async) as caller">{{caller.username}} is calling...</h2>
+    <button class="btn btn-accent" (click)="accept()">Accept</button>
+    <button class="btn btn-error" (click)="cancel()">Cancel</button>
+    <button class="btn btn-error" (click)="block(); cancel()">Cancel and block</button>
+
+</div>

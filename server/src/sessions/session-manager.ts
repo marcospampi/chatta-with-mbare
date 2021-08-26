@@ -10,6 +10,9 @@ export class SessionManager {
     
     public sessions: Set<Session> = new Set;
     public activeUsers: Set<string> = new Set;
+    public static create( server: Server ) {
+        return new SessionManager( server );
+    }
     constructor( private server: Server ) {
         server.on( 'connect' , this.createSession.bind( this ) );
 

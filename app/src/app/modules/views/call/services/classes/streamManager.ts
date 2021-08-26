@@ -1,127 +1,242 @@
-import { BehaviorSubject, combineLatest, fromEvent, Observable } from "rxjs";
-import { map, shareReplay } from "rxjs/operators";
+import { NgZone } from "@angular/core";
+import { zonePipe } from "@utils/zoner";
+import Peer, { MediaConnection } from "peerjs";
+import { BehaviorSubject, combineLatest, defer, fromEvent, Observable, ReplaySubject, Subscription } from "rxjs";
+import { filter, map, mergeMap, shareReplay, switchMap, switchMapTo, tap } from "rxjs/operators";
 
-export type StreamManagerObservableContent = {
-    video: MediaStream|null;
-    audio: MediaStream|null;
-    screen: MediaStream|null;
+export type CallManagerLocalState = {
+    audio: boolean,
+    video: boolean,
+    screen: boolean
 }
-export type StreamManagerTrackType = 'video'|'audio'|'screen';
-export abstract class StreamManager {
-    private video$$ = new BehaviorSubject<MediaStream|null>(null);
-    private audio$$ = new BehaviorSubject<MediaStream|null>(null);
-    private screen$$ = new BehaviorSubject<MediaStream|null>(null);
-    public $: Observable<StreamManagerObservableContent>;
-    public active$: Observable<{[key: string]: boolean}>
-    protected getStreamSubject(type: StreamManagerTrackType ) {
-        switch ( type ) {
-            case 'video': return this.video$$;
-            case 'audio': return this.audio$$;
-            case 'screen': return this.screen$$;
-        }
-    }
-    constructor( ) {
-        this.$ = combineLatest([this.video$$, this.audio$$, this.screen$$ ]).pipe(
-            map( ([video,audio,screen]) => ({video,audio,screen}) ),
-            shareReplay(1)
+
+export class CallManager {
+    private defaultVideoConstraints: { width: number, height: number };
+    private dummyMediaStreamTracks: { audio: MediaStreamTrack, video: MediaStreamTrack };
+    private subscriptions: Subscription = new Subscription;
+    private call?: MediaConnection;
+    private screenCall?: MediaConnection;
+
+    private state$$: ReplaySubject<CallManagerLocalState> = new ReplaySubject(1);
+    public state$: Observable<CallManagerLocalState> = this.state$$.asObservable();
+
+    private localStream: { audio?: MediaStream, video?: MediaStream, screen?: MediaStream } = {
+        audio: null, video: null, screen: null
+    };
+    private remoteStreams: {
+        audio_video?: MediaStream,
+        screen?: MediaStream
+    } = { audio_video: null, screen: null };
+    private remoteStreams$$ = new ReplaySubject<{audio_video: MediaStream, screen: MediaStream }>(1);
+    public remoteStreams$ = this.remoteStreams$$.asObservable();
+
+    constructor(private peer: Peer, private callerOrCallee: 'caller' | 'callee', private palId: string) {
+        this.updateState();
+        this.defaultVideoConstraints = this.calculateDefaultVideoConstraints();
+
+        this.dummyMediaStreamTracks = this.createDummyTracks();
+        const dummyMediaStream = new MediaStream([this.dummyMediaStreamTracks.audio, this.dummyMediaStreamTracks.video])
+
+        const onceCalled$ = fromEvent<MediaConnection>(peer, "call", { once: true }).pipe(
+            tap(e => e.answer(dummyMediaStream)),
+            switchMap(call => {
+                return fromEvent<MediaStream>(call, 'stream').pipe(
+                    map<MediaStream, [MediaConnection, MediaStream]>(stream => [call, stream])
+                )
+            })
         );
-        this.active$ = this.$.pipe(
-            map( e => Object.entries( e ).reduce((dic, [key, value ]) => ({ ...dic, [key]: !!value }), {})),
-            shareReplay(1)
-        )
-        
-    }
-    protected attachSource(type: StreamManagerTrackType, source: MediaStream ) {
-        const subject = this.getStreamSubject( type );
-        if ( subject.value !== null ) {
-            this.detachSource( subject );
-        }
-        subject.next( source );
-        fromEvent( source, 'ended', { once: true }).subscribe(
-            event => this.detachSource( subject )
-        );
-    }
-    protected detachSource( typeOrSubject: StreamManagerTrackType|BehaviorSubject<MediaStream|null> ) {
-        let subject = typeof(typeOrSubject) === 'string'
-            ? this.getStreamSubject( typeOrSubject )
-            : typeOrSubject;
-        const value = subject.value;
-        if ( value ) {
-            for ( let track of value.getTracks() ){
-                track.stop();
-                value.removeTrack( track );
+        const callOnce$ = defer(() => {
+            const call = peer.call(palId, dummyMediaStream);
+            return fromEvent<MediaStream>(call, 'stream').pipe(
+                map<MediaStream, [MediaConnection, MediaStream]>(stream => [call, stream])
+            )
+        });
+        let role$ = callerOrCallee === 'caller' ? callOnce$ : onceCalled$;
+        role$.subscribe(
+            ([call, stream]) => {
+                this.call = call;
+                this.remoteStreams.audio_video = stream;
+                this.updateRemoteStreamSubject();
             }
-            subject.next( null );
-        }
+        );
         
-    }
+        // screen event
+        fromEvent<MediaConnection>(peer, 'call').pipe(
+            filter( call => call?.metadata?.type === 'screen'),
+            mergeMap(
+                call => fromEvent<MediaStream>(call,'stream').pipe(
+                    map<MediaStream, [MediaConnection, MediaStream]>(stream => [call, stream])
+                )
+            )
+        ).subscribe(
+            ([call, stream]) => {
+                this.remoteStreams.screen = stream;
+                this.updateRemoteStreamSubject();
+                fromEvent(call, 'close', { once: true }).subscribe(
+                    closed => {
+                        call.close();
+                        this.remoteStreams.screen = null;
+                        this.updateRemoteStreamSubject();
+                    }
+                )
+            }
+        )
 
-    public destructor() {
-        for ( let i of ['video', 'audio', 'screen']) {
-            const source = this.getStreamSubject( i as any );
-            this.detachSource( source );
-            source.complete();
+
+    }
+    private calculateDefaultVideoConstraints() {
+        let width = 1280;
+        let height = 720;
+        if (screen.orientation.type.match(/portrait/)) {
+            [width, height] = [height, width]
         }
+        return { width, height };
     }
-}
+    private createDummyTracks() {
+        const audio = (() => {
+            const ctx = new AudioContext(), oscillator = ctx.createOscillator();
+            const dst = ctx.createMediaStreamDestination();
+            oscillator.connect(dst);
+            oscillator.start();
+            return Object.assign(dst.stream.getAudioTracks()[0], { enabled: false });
+        })()
 
-export class LocalUserStreamManager extends StreamManager {
-    constructor( ) {
-        super();
+        const video = ((): MediaStreamTrack & { enabled: boolean } => {
+            const { width, height } = this.defaultVideoConstraints
+            let canvas = Object.assign(document.createElement("canvas"), { width, height });
+            canvas.getContext('2d').fillRect(0, 0, width, height);
+
+            let stream = (canvas as any).captureStream();
+            return Object.assign(stream.getVideoTracks()[0], { enabled: true });
+        })()
+
+        return { audio, video };
+
     }
 
-    public toggleTrack ( type: StreamManagerTrackType ) {
-        if ( this.getStreamSubject( type ).value === null ) {
-            this.requestTrack( type );
+    dispose() {
+        this.call?.close();
+
+        for (let stream of Object.values(this.localStream)) {
+            if (stream) {
+                for (let track of stream.getTracks()) {
+                    track.stop();
+                    stream.removeTrack(track);
+                }
+            }
+        }
+
+        this.dummyMediaStreamTracks.audio.stop();
+        this.dummyMediaStreamTracks.video.stop();
+
+        this.state$$.complete();
+        this.subscriptions.unsubscribe();
+    }
+    async toggleVideo() {
+        if (this.localStream.video !== null) {
+            const stream = this.localStream.video;
+
+            for (let track of stream.getTracks()) {
+                track.stop();
+                stream.removeTrack(track);
+            }
+            this.localStream.video = null;
+            this.updateAudioVideoStream({ type: 'video', stream: null })
+            this.updateState();
+
         }
         else {
-            this.disposeTrack( type );
-        }
-    }
-    requestTrack( type: StreamManagerTrackType ) {
-        const constraints: any = {}
-        switch( type ) {
-            case 'video': {
-                constraints.video = true;
-                break;
-            }
-            case 'audio': {
-                constraints.audio = true;
-                break;
-            }
-            case 'screen':
-                this.requestScreen();
-                return;        
-        }
-
-        const $success = ( stream: MediaStream ) => {
-            this.attachSource( type, stream )
-        }
-        const $error = ( error: MediaStreamError) => console.error( error );
-
-        navigator.mediaDevices.getUserMedia( constraints )
-            .then( $success )
-            .catch( $error )
-    }
-    private async requestScreen() {
-        if ( 'getDisplayMedia' in navigator.mediaDevices ) {
             try {
-                const stream: MediaStream = (  await (navigator.mediaDevices as any ).getDisplayMedia({audio: true, video: true }));
-                this.attachSource('screen', stream );
+                const stream = await navigator.mediaDevices.getUserMedia({ video: this.defaultVideoConstraints });
+                this.localStream.video = stream;
+                await this.updateAudioVideoStream({ type: 'video', stream: stream.getVideoTracks()[0] })
+                this.updateState();
             }
-            catch( error ) {
-                console.error( error );
+            catch (error) {
+                console.error(error);
             }
+
+        }
+    }
+    async toggleAudio( ) {
+        if (this.localStream.audio !== null) {
+            const stream = this.localStream.audio;
+
+            for (let track of stream.getTracks()) {
+                track.stop();
+                stream.removeTrack(track);
+            }
+            this.localStream.audio = null;
+            this.updateAudioVideoStream({ type: 'audio', stream: null })
+            this.updateState();
+
+        }
+        else {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                this.localStream.audio = stream;
+                await this.updateAudioVideoStream({ type: 'audio', stream: stream.getAudioTracks()[0] })
+                this.updateState();
+            }
+            catch (error) {
+                console.error(error);
+            }
+
+        }
+    }
+    async toggleScreen( ) {
+        if ( this.localStream.screen ) {
+            this.screenCall?.close();
+            this.screenCall = null;
+            const screen = this.localStream.screen;
+            for ( let track of this.localStream.screen?.getTracks() ?? []) {
+                track.stop();
+                screen.removeTrack( track );
+
+            }
+            this.localStream.screen = null;
+            this.updateState();
+        }
+        else {
+            try {
+                const screen = await ((navigator.mediaDevices as any).getDisplayMedia({audio: true, video: true }) as Promise<MediaStream>);
+                this.localStream.screen = screen;
+                this.screenCall = this.peer.call( this.palId, screen ,{ metadata: { type: 'screen' }})
+                this.updateState();
+
+                
+            }
+            catch(error) {
+                console.error(error);
+            }
+            
         }
     }
 
-    disposeTrack( type: StreamManagerTrackType ) {
-        this.detachSource( type );
+    private updateState() {
+        this.state$$.next({
+            audio: !!this.localStream.audio,
+            video: !!this.localStream.video,
+            screen: !!this.localStream.screen
+        })
     }
-}
 
-export class RemoteUserStreamManager extends StreamManager {
-    addSource( type: StreamManagerTrackType , stream: MediaStream ) {
-        this.attachSource( type, stream );
+    private updateAudioVideoStream(change: { type: 'video' | 'audio', stream?: MediaStreamTrack }) {
+        const senders = this.call?.peerConnection.getSenders() ?? [];
+        let matchingDummyTrack = this.dummyMediaStreamTracks[change.type];
+        const sender = senders.find(e => e.track.kind === matchingDummyTrack.kind);
+
+        let replaceWith = change.stream ?? matchingDummyTrack;
+        return sender.replaceTrack(replaceWith)
+            .then(() => console.log(`Changed ${change.type} track with ${change.stream ? 'real' : 'dummy'} track`))
+            .catch((error) => console.error(error))
+
     }
+    private updateRemoteStreamSubject() {
+        this.remoteStreams$$.next({
+            audio_video: this.remoteStreams.audio_video,
+            screen: this.remoteStreams.screen
+        })
+    }
+
 }

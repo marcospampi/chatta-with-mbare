@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { from, Observable, Subscription } from 'rxjs';
 import { distinctUntilKeyChanged, filter, groupBy, mergeMap, shareReplay, skip, tap } from 'rxjs/operators';
-import { StreamManager, StreamManagerObservableContent  } from '../../services/classes/streamManager';
+import { CallManager  } from '../../services/classes/streamManager';
 
 @Component({
   selector: 'call-present',
@@ -15,7 +15,7 @@ export class PresentComponent implements OnInit {
   @ViewChild("secondaryVideoOutput", { static: true }) secondaryVideoOutput: ElementRef<HTMLMediaElement>;
 
   @Input('streams')
-  public streams$: Observable<StreamManagerObservableContent>;
+  public streams$: Observable<{audio_video?: MediaStream, screen?: MediaStream}>;
 
   public changes$: Observable<{type:string, stream: MediaStream}>;
   public video$: Observable<{type: string, stream: MediaStream}>
@@ -43,18 +43,15 @@ export class PresentComponent implements OnInit {
     this.secondaryVideoOutput.nativeElement.srcObject = oldPrimary;
   }
   handleChanges( change: {type: string, stream: MediaStream }) {
-    console.log( change )
-    let target: HTMLMediaElement;
-    switch( change.type ) {
-      case 'video':
-      case 'screen':
-        
-        this.mainVideoOutput.nativeElement.srcObject = change.stream;
-        break;
+    console.log( {change} )
+    if ( change.stream)
+    this.mainVideoOutput.nativeElement.srcObject = change.stream;
 
-      case 'audio':
-        this.audioOutput.nativeElement.srcObject = change.stream;
-        break;
-    }
+    //let target: HTMLMediaElement;
+    //switch( change.type ) {
+    //  case 'audio_video':
+    //  case 'screen':
+    //    break;
+    //}
   }
 }

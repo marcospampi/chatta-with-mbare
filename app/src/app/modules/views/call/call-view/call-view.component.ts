@@ -1,8 +1,10 @@
 import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { zonePipe } from '@utils/zoner';
-import { BehaviorSubject, from, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilChanged, distinctUntilKeyChanged, groupBy, mergeMap, shareReplay, skip, tap } from 'rxjs/operators';
-import { LocalUserStreamManager } from '../services/classes/streamManager';
+import { CallService } from '../services/call.service';
+import { CallManager } from '../services/classes';
 
 @Component({
   selector: 'app-call-view',
@@ -14,17 +16,24 @@ export class CallViewComponent implements OnInit, OnDestroy {
   //@ViewChild("videoOutput", { static: true }) videoOutput: ElementRef<HTMLVideoElement>;
   //@ViewChild("screenOutput", { static: true }) screenOutput: ElementRef<HTMLVideoElement>;
 
-  public localStream = new LocalUserStreamManager;
-  public active$: Observable<any>;
-  private subscriptions: Subscription;;
+  //public localStream = new LocalUserStreamManager;
+  public active$: Observable<any> = of({ video: false, audio: false, screen: false });
+  public streams$: Observable<{ audio_video?: MediaStream, screen?: MediaStream }>;
+  private subscriptions: Subscription;
+  private callManager: CallManager;
   constructor(
-    private zone: NgZone
+    private zone: NgZone,
+    private activeRoute: ActivatedRoute,
+    private callService: CallService
   ) {
-    this.active$ = this.localStream.active$.pipe(
-      zonePipe( this.zone ),
+    this.callManager = this.activeRoute.snapshot.data['callManager'];
+    console.log(this.callManager)
+    this.active$ = this.callManager.state$.pipe(
+      zonePipe(this.zone),
       shareReplay(1)
     );
-   
+    this.streams$ = this.callManager.remoteStreams$;
+
   }
 
   ngOnInit(): void {
@@ -40,36 +49,16 @@ export class CallViewComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+    this.callService.disposeCallManager();
   }
 
-  handleVideoChanges( input: {type: string, stream: MediaStream} ): void {
-    return;
-    /*switch( input.type ) {
-      case 'video': {
-        this.videoOutput.nativeElement.srcObject = input.stream;
-        if ( input.stream )
-          this.videoOutput.nativeElement.play();
-        else
-          this.videoOutput.nativeElement.pause();
-        break;
-      };
-      case 'audio': {
-        this.audioOutput.nativeElement.srcObject = input.stream;
-        if ( input.stream )
-          this.audioOutput.nativeElement.play();
-        else
-          this.audioOutput.nativeElement.pause();
-        break;
-      };
-      case 'screen': {
-        this.screenOutput.nativeElement.srcObject = input.stream;
-        if ( input.stream )
-          this.screenOutput.nativeElement.play();
-        else
-          this.screenOutput.nativeElement.pause();
-        break;
-      };
-    } */
+  toggleTrack(track: 'audio' | 'video' | 'screen') {
+    switch (track) {
+      case 'audio': return this.callManager.toggleAudio();
+      case 'video': return this.callManager.toggleVideo();
+      case 'screen': return this.callManager.toggleScreen();
+    }
   }
+
 
 }

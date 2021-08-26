@@ -5,10 +5,10 @@
             <video style="max-width: 320px; max-height: 240px; background-color: white;" #videoOutput ></video>
             <video style="max-width: 320px; max-height: 240px; background-color: white;" #screenOutput></video>
         -->
-        <call-present [streams]="localStream.$"></call-present>
+        <call-present [streams]="streams$"></call-present>
     </div>
     <div class="navbar d-flex bottom align-center justify-center" >
-        <button class="btn icon invert-on-dark" (click)="localStream.toggleTrack('audio')" >
+        <button class="btn icon invert-on-dark" (click)="toggleTrack('audio')" >
 
             <ng-container [ngSwitch]="(active$|async).audio">
                 <svg *ngSwitchCase="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
@@ -41,7 +41,7 @@
             
 
         </button>
-         <button class="btn icon invert-on-dark" (click)="localStream.toggleTrack('video')">
+         <button class="btn icon invert-on-dark" (click)="toggleTrack('video')">
             <ng-container [ngSwitch]="(active$|async).video">
                 <svg *ngSwitchCase="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
                     <path
@@ -60,7 +60,7 @@
             'invert-on-dark': !state.screen,
             'btn-accent': state.screen
         }"
-        (click)="localStream.toggleTrack('screen')"
+        (click)="toggleTrack('screen')"
         >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
                 <path

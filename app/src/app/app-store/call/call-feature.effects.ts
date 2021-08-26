@@ -3,7 +3,7 @@ import { UsersTable } from '@modules/database/database.service';
 import { sessionActions, SessionManager } from '@modules/session-manager';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { concat, defer, EMPTY, from, iif, Observable, of } from 'rxjs';
-import { concatAll, concatMap, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { concatAll, concatMap, map, mapTo, mergeMap, mergeMapTo, switchMap, switchMapTo, tap } from 'rxjs/operators';
 import * as callActions from "./call-feature.actions";
 import * as userActions from "./../user";
 import { Store } from '@ngrx/store';
@@ -75,6 +75,21 @@ export class CallFeatureEffects {
     error: console.error,
     complete: () => console.log("complete wtf")
   });
+
+  endCall$ = createEffect( () => this.actions$.pipe(
+    ofType( callActions.callClosed ),
+    mergeMapTo( [
+      callActions.patchState({state: { inCall: false }}),
+      sessionActions.requestUserPatch({
+        payload: {
+          patch: { 
+            isBusy: false 
+          }
+        }
+      })
+    ] ),
+      
+  ))
 
   
 
