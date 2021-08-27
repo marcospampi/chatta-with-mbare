@@ -41,8 +41,8 @@
         </div>
 
         <div class="d-flex column gap-1 pad-1">
-            <div  class="btn d-flex align-center gap-1 pad-1" [routerLink]="['readme']">
-                <img class="user-image invert-on-dark" src="assets/icons/help-browser-symbolic.svg" alt="">
+            <div  class="btn d-flex align-center gap-1 pad-1" [routerLink]="['readme']" (click)="toggleSidebar(false)">
+                <img class="user-image invert-on-dark" src="assets/icons/help-browser-symbolic.svg" alt="" >
                 <span>README</span>
             </div>
             <div  class="btn d-flex align-center gap-1 pad-1" *ngFor="let user of (users$|async)" [routerLink]="['chat',user.uuid]" (click)="toggleSidebar(false)">

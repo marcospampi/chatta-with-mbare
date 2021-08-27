@@ -1,5 +1,8 @@
 import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { requestUserPatch } from '@modules/session-manager/actions';
+import { Store } from '@ngrx/store';
+import { AppState } from '@store/app-state';
 import { zonePipe } from '@utils/zoner';
 import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilChanged, distinctUntilKeyChanged, groupBy, mergeMap, shareReplay, skip, tap } from 'rxjs/operators';
@@ -21,10 +24,14 @@ export class CallViewComponent implements OnInit, OnDestroy {
   public streams$: Observable<{ audio_video?: MediaStream, screen?: MediaStream }>;
   private subscriptions: Subscription;
   private callManager: CallManager;
+  private hasRequestedClose: boolean = false;
   constructor(
     private zone: NgZone,
     private activeRoute: ActivatedRoute,
-    private callService: CallService
+    private callService: CallService,
+    private router: Router,
+    private store: Store<AppState>
+
   ) {
     this.callManager = this.activeRoute.snapshot.data['callManager'];
     console.log(this.callManager)
@@ -33,7 +40,10 @@ export class CallViewComponent implements OnInit, OnDestroy {
       shareReplay(1)
     );
     this.streams$ = this.callManager.remoteStreams$;
-
+    
+    this.callManager.close$.subscribe(
+      () => this.router.navigate(['/','app','chat',this.callManager.palId])
+    )
   }
 
   ngOnInit(): void {
@@ -49,7 +59,8 @@ export class CallViewComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
-    this.callService.disposeCallManager();
+    this.callService.disposeCallManager( this.hasRequestedClose );
+    this.store.dispatch(requestUserPatch({payload:{patch: { isBusy: false }}}))
   }
 
   toggleTrack(track: 'audio' | 'video' | 'screen') {
@@ -58,6 +69,11 @@ export class CallViewComponent implements OnInit, OnDestroy {
       case 'video': return this.callManager.toggleVideo();
       case 'screen': return this.callManager.toggleScreen();
     }
+  }
+
+  closeCall() {
+    this.hasRequestedClose = true;
+    this.router.navigate(['/', 'app', 'chat', this.callManager.palId ])
   }
 
 

@@ -10,48 +10,44 @@ import { CallManager  } from '../../services/classes/streamManager';
 })
 export class PresentComponent implements OnInit {
 
-  @ViewChild("audioOutput", { static: true }) audioOutput: ElementRef<HTMLMediaElement>;
-  @ViewChild("mainVideoOutput", { static: true }) mainVideoOutput: ElementRef<HTMLMediaElement>;
-  @ViewChild("secondaryVideoOutput", { static: true }) secondaryVideoOutput: ElementRef<HTMLMediaElement>;
+  @ViewChild("primaryOutput", { static: true }) primaryOutput: ElementRef<HTMLMediaElement>;
+  @ViewChild("secondaryOutput", { static: true }) secondaryOutput: ElementRef<HTMLMediaElement>;
 
   @Input('streams')
   public streams$: Observable<{audio_video?: MediaStream, screen?: MediaStream}>;
-
-  public changes$: Observable<{type:string, stream: MediaStream}>;
-  public video$: Observable<{type: string, stream: MediaStream}>
   
   private subscriptions: Subscription;
   constructor() { }
 
   ngOnInit(): void {
     this.subscriptions = new Subscription;
-    this.changes$ = this.streams$.pipe(
-      mergeMap( e => from(Object.entries(e).map(e => ({type: e[0], stream: e[1]})))),
-      groupBy( e => e.type ),
-      mergeMap( e => e.pipe( distinctUntilKeyChanged('stream'))),
-    );
 
-    this.video$ = this.changes$.pipe( filter ( e => e.type == 'video' || e.type == 'screen' ))
 
-    this.subscriptions.add( this.changes$.subscribe( this.handleChanges.bind(this)))
+    this.subscriptions.add( this.streams$.subscribe( this.handleChanges.bind(this)))
   }
-  private swapVideo() {
-    const oldPrimary = this.mainVideoOutput.nativeElement.srcObject;
-    const oldSecondary = this.secondaryVideoOutput.nativeElement.srcObject;
-
-    this.mainVideoOutput.nativeElement.srcObject = oldSecondary;
-    this.secondaryVideoOutput.nativeElement.srcObject = oldPrimary;
+  
+  setSource( target_:'primary'|'secondary', stream?: MediaStream) {
+    const target = target_ === 'primary'  
+      ? this.primaryOutput.nativeElement
+      : this.secondaryOutput.nativeElement;
+    if ( stream ) {
+      target.srcObject = stream;
+      target.play();
+    }
+    else {
+      target.srcObject = null;
+      target.pause();
+    }
   }
-  handleChanges( change: {type: string, stream: MediaStream }) {
-    console.log( {change} )
-    if ( change.stream)
-    this.mainVideoOutput.nativeElement.srcObject = change.stream;
-
-    //let target: HTMLMediaElement;
-    //switch( change.type ) {
-    //  case 'audio_video':
-    //  case 'screen':
-    //    break;
-    //}
+  handleChanges( streams: {audio_video?: MediaStream, screen?: MediaStream}) {
+    console.log({streams})
+    if ( streams.audio_video && !streams.screen ) {
+      this.setSource('primary', streams.audio_video);
+      this.setSource('secondary', null );
+    }
+    else if ( streams.audio_video && streams.screen ) {
+      this.setSource('primary', streams.screen);
+      this.setSource('secondary', streams.audio_video);
+    }
   }
 }

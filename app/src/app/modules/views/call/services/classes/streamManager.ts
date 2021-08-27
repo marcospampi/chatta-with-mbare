@@ -1,8 +1,8 @@
 import { NgZone } from "@angular/core";
 import { zonePipe } from "@utils/zoner";
 import Peer, { MediaConnection } from "peerjs";
-import { BehaviorSubject, combineLatest, defer, fromEvent, Observable, ReplaySubject, Subscription } from "rxjs";
-import { filter, map, mergeMap, shareReplay, switchMap, switchMapTo, tap } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, defer, fromEvent, Observable, of, ReplaySubject, Subscription, timer } from "rxjs";
+import { filter, map, mapTo, mergeMap, shareReplay, switchMap, switchMapTo, tap } from "rxjs/operators";
 
 export type CallManagerLocalState = {
     audio: boolean,
@@ -30,13 +30,22 @@ export class CallManager {
     private remoteStreams$$ = new ReplaySubject<{audio_video: MediaStream, screen: MediaStream }>(1);
     public remoteStreams$ = this.remoteStreams$$.asObservable();
 
-    constructor(private peer: Peer, private callerOrCallee: 'caller' | 'callee', private palId: string) {
+    constructor(
+        private peer: Peer, 
+        public readonly callerOrCallee: 'caller' | 'callee', 
+        public readonly palId: string,
+        public readonly close$: Observable<void>
+        ) {
+        // replay subject says no sharing 
         this.updateState();
+        // calculate a 1280x720 constraints
         this.defaultVideoConstraints = this.calculateDefaultVideoConstraints();
 
+        // create the dummy media tracks
         this.dummyMediaStreamTracks = this.createDummyTracks();
         const dummyMediaStream = new MediaStream([this.dummyMediaStreamTracks.audio, this.dummyMediaStreamTracks.video])
 
+        // subscribable for callee
         const onceCalled$ = fromEvent<MediaConnection>(peer, "call", { once: true }).pipe(
             tap(e => e.answer(dummyMediaStream)),
             switchMap(call => {
@@ -45,12 +54,15 @@ export class CallManager {
                 )
             })
         );
+        // subscribable for caller
         const callOnce$ = defer(() => {
             const call = peer.call(palId, dummyMediaStream);
             return fromEvent<MediaStream>(call, 'stream').pipe(
                 map<MediaStream, [MediaConnection, MediaStream]>(stream => [call, stream])
             )
         });
+
+        // pick role and then subscribe
         let role$ = callerOrCallee === 'caller' ? callOnce$ : onceCalled$;
         role$.subscribe(
             ([call, stream]) => {
@@ -60,8 +72,8 @@ export class CallManager {
             }
         );
         
-        // screen event
-        fromEvent<MediaConnection>(peer, 'call').pipe(
+        // listen to calls
+        this.subscriptions.add(fromEvent<MediaConnection>(peer, 'call').pipe(
             filter( call => call?.metadata?.type === 'screen'),
             mergeMap(
                 call => fromEvent<MediaStream>(call,'stream').pipe(
@@ -80,7 +92,7 @@ export class CallManager {
                     }
                 )
             }
-        )
+        ));
 
 
     }
@@ -88,6 +100,7 @@ export class CallManager {
         let width = 1280;
         let height = 720;
         if (screen.orientation.type.match(/portrait/)) {
+            // swap on portrait
             [width, height] = [height, width]
         }
         return { width, height };
@@ -104,8 +117,14 @@ export class CallManager {
         const video = ((): MediaStreamTrack & { enabled: boolean } => {
             const { width, height } = this.defaultVideoConstraints
             let canvas = Object.assign(document.createElement("canvas"), { width, height });
-            canvas.getContext('2d').fillRect(0, 0, width, height);
 
+            // make the canvas black every 1s
+            const update$ = of( canvas.getContext('2d') ).pipe(
+                switchMap( ctx => timer(0,1000).pipe( mapTo(ctx) ) ),
+                tap( ctx => ctx.fillRect(0, 0, width, height))
+            )
+            this.subscriptions.add( update$.subscribe() )
+            
             let stream = (canvas as any).captureStream();
             return Object.assign(stream.getVideoTracks()[0], { enabled: true });
         })()
@@ -236,7 +255,7 @@ export class CallManager {
         this.remoteStreams$$.next({
             audio_video: this.remoteStreams.audio_video,
             screen: this.remoteStreams.screen
-        })
+        });
     }
 
 }
