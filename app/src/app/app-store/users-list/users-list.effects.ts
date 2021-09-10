@@ -18,12 +18,7 @@ export class UsersListEffects {
         ofType( actions.blockUser, actions.unblockUser),
         map( action => ({...action.user, isBlocked: action.type === actions.blockUser.type }) ),
         mergeMap( user => defer(
-                () => this.usersTable.put( {
-                    uuid: user.uuid,
-                    username: user.username,
-                    pictureName: user.pictureName,
-                    isBlocked: true
-                } )
+                () => this.usersTable.update( user.uuid, {'isBlocked': user.isBlocked})
             ).pipe(
                 mapTo( sessionActions.userPatched({payload: user }))
             )

@@ -84,13 +84,14 @@ export class SessionEffects {
               for ( let pal of pals ) {
                 if ( pal.uuid in users ) {
                   users[pal.uuid].isPal = true;
+                  users[pal.uuid].isBlocked = pal.isBlocked;
                 }
                 else {
                   users[pal.uuid] = {
                     ...pal,
                     isOnline: false,
                     isBusy: false,
-                    isPal: true
+                    isPal: true,
                   }
                 }
               }

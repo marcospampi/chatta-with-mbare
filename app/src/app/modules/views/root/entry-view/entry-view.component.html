@@ -1,6 +1,6 @@
 <div *ngIf="(ui$|async) as ui" class="theme d-grid" [class.bg-dark]="ui.theme == 'dark'"
     [class.bg-light]="ui.theme == 'light'" [class.show]="ui.sidebar">
-    <div id="navbar" class="col-md-5 col-lg-4 col-xl-3 col-xxl-2 border-right">
+    <div id="navbar" class="col-md-5 col-lg-4 col-xxl-3 border-right">
 
         <div class="navbar d-flex top align-center">
             <div 
@@ -53,7 +53,7 @@
 
         </div>
     </div>
-    <div id="router" class="col-md-7 col-lg-8 col-xl-9 col-xxl-10 d-flex column">
+    <div id="router" class="col-md-7 col-lg-8 col-xxl-9 d-flex column">
         <!--<div class="navbar d-flex top align-center">
             <button *ngIf="ui.collapsedMenu" class="btn icon invert-on-dark icon" (click)="toggleSidebar()">
                 <svg height="16px" viewBox="0 0 16 16" width="16px" xmlns="http://www.w3.org/2000/svg">

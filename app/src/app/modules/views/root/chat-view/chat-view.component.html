@@ -8,10 +8,15 @@
             </g>
         </svg>
     </button>
-    <ng-container *ngIf="(pal$|async) as pal">
-        <div class="btn d-flex align-center gap-1 pad-1 flex-grow" >
+    <ng-container *ngIf="(pal$|async) as pal" >
+        <div class="btn d-flex align-center gap-1 pad-1 flex-grow" [matMenuTriggerFor]="menu">
             <user-picture [user]="pal"></user-picture>
             <span>{{pal.username}}</span>
+            <mat-menu #menu="matMenu">
+                <button mat-menu-item style="color: red;" (click)="toggleBlockUser( pal )">
+                    {{pal.isBlocked ? 'Unblock calls' : 'Block calls'}}
+                </button>
+            </mat-menu>
         </div>
         <button class="btn btn-accent  icon" [disabled]="(!pal.isOnline)||pal.isBusy" [routerLink]="['/app/avchat/call', pal.uuid ]">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
@@ -21,3 +26,4 @@
     </ng-container >
 </div>
 <app-chat [chat]="uuid$"></app-chat>
+

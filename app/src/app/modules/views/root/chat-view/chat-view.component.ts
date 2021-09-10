@@ -8,6 +8,7 @@ import { map, mergeMap, shareReplay } from 'rxjs/operators';
 
 import * as ui from "@store/ui";
 import { selectors as usersSelectors } from '@store/users-list';
+import { actions as users_list_actions } from '@store/users-list';
 
 @Component({
   selector: 'app-chat-view',
@@ -43,5 +44,14 @@ export class ChatViewComponent implements OnInit {
   }
   toggleSidebar(preferred?: boolean ) {
     this.store.dispatch( ui.actions.toggleSidebar({value: preferred}))
+  }
+  toggleBlockUser( pal: User ) {
+    if ( pal.isBlocked === true ) {
+      this.store.dispatch( users_list_actions.unblockUser( {user: pal} ) );
+    }
+    else {
+      this.store.dispatch(users_list_actions.blockUser( {user: pal} ));
+    }
+   
   }
 }

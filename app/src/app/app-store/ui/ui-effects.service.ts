@@ -20,6 +20,7 @@ export class UiEffectsService implements OnDestroy {
   }
 
   private getEvents(): Observable<ResponsivenessState> {
+    const nospacesplz = ( s: string ) => s.replace(/\s*/g, '');
     const breakpoints = {
       xs: getComputedStyle(document.documentElement).getPropertyValue(`--constant-breakpoint-xs`),
       sm: getComputedStyle(document.documentElement).getPropertyValue(`--constant-breakpoint-sm`),
@@ -30,26 +31,25 @@ export class UiEffectsService implements OnDestroy {
     }
     
     const reverseMatcher: {[key: string]: ResponsivenessState} = {
-      [`(min-width:${breakpoints.xs})`]: 'xs',
-      [`(min-width:${breakpoints.sm})`]: 'sm',
-      [`(min-width:${breakpoints.md})`]: 'md',
-      [`(min-width:${breakpoints.lg})`]: 'lg',
-      [`(min-width:${breakpoints.xl})`]: 'xl',
-      [`(min-width:${breakpoints.xxl})`]: 'xxl'
+      [nospacesplz(`(min-width:${breakpoints.xs})`)]: 'xs',
+      [nospacesplz(`(min-width:${breakpoints.sm})`)]: 'sm',
+      [nospacesplz(`(min-width:${breakpoints.md})`)]: 'md',
+      [nospacesplz(`(min-width:${breakpoints.lg})`)]: 'lg',
+      [nospacesplz(`(min-width:${breakpoints.xl})`)]: 'xl',
+      [nospacesplz(`(min-width:${breakpoints.xxl})`)]: 'xxl'
     }
     
     const matchers = {
-      xs: matchMedia( `(min-width: ${breakpoints.xs})`),
-      sm: matchMedia( `(min-width: ${breakpoints.sm})`),
-      md: matchMedia( `(min-width: ${breakpoints.md})`),
-      lg: matchMedia( `(min-width: ${breakpoints.lg})`),
-      xl: matchMedia( `(min-width: ${breakpoints.xl})`),
+      xs: matchMedia(`(min-width: ${breakpoints.xs})`),
+      sm: matchMedia(`(min-width: ${breakpoints.sm})`),
+      md: matchMedia(`(min-width: ${breakpoints.md})`),
+      lg: matchMedia(`(min-width: ${breakpoints.lg})`),
+      xl: matchMedia(`(min-width: ${breakpoints.xl})`),
       xxl: matchMedia(`(min-width: ${breakpoints.xxl})`)
     }
 
-    const firstEmission = Object.entries( matchers ).reverse().find( e => e[1].matches == true ) ?? 'xs';
+    //const firstEmission = Object.entries( matchers ).reverse().find( e => e[1].matches == true ) ?? 'xs';
 
-    
     const observables = [
       fromEvent<MediaQueryListEvent>(matchers.xs,'change' ).pipe(
         startWith( matchers.xs )
@@ -70,10 +70,11 @@ export class UiEffectsService implements OnDestroy {
         startWith( matchers.xxl)
       )
     ];
+    
     return combineLatest(observables).pipe(
       map( e => {
-        const array: [ResponsivenessState, boolean][] = e.filter( e => e.matches).map(e => [reverseMatcher[e.media], e.matches ]);
-        
+        const array: [ResponsivenessState, boolean][] = e.filter( e => e.matches).map(e => [reverseMatcher[nospacesplz(e.media)], e.matches ]);
+
         const latest = array.pop();
         if ( latest ) {
           return latest[0] ?? 'xs';

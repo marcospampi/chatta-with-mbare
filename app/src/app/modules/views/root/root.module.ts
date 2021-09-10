@@ -7,7 +7,7 @@ import { ChatViewComponent } from './chat-view/chat-view.component';
 import { EntryViewComponent } from './entry-view/entry-view.component';
 import { ReadmeViewComponent } from './readme-view/readme-view.component';
 import { SharedModule } from '@modules/shared/shared.module';
-
+import { MatMenuModule } from '@angular/material/menu'
 const routes: Routes = [
   { 
     path: '', component: EntryViewComponent ,children: [
@@ -50,7 +50,8 @@ const routes: Routes = [
     RouterModule.forChild( routes ),
     FormsModule,
     ReactiveFormsModule,
-    SharedModule
+    SharedModule,
+    MatMenuModule
   ],
   exports: [
     RouterModule
