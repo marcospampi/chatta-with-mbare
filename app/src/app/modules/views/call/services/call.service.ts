@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, defer, Observable, of, pipe, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, defer, from, fromEvent, Observable, of, pipe, ReplaySubject } from 'rxjs';
 import { filter, map, mapTo, take } from 'rxjs/operators';
 import { CallModule } from '../call.module';
 
@@ -28,8 +28,15 @@ export class CallService {
       uuid => {
         const peer = new Peer(uuid);
         window['peer'] = peer;
-        console.log({connected: !peer.disconnected})
-        this.peer$$.next( peer );
+        console.log({connected: !peer.disconnected});
+
+        fromEvent(peer, 'open', { once: true }).subscribe(
+          next => {
+            console.log('mi aprii')
+            this.peer$$.next( peer )
+          }
+        );
+
         
       }
     )
